@@ -1,0 +1,108 @@
+{
+  "name": "Login form",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Login Form",
+        "formDescription": "Please enter your details below.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "placeholder": "Enter your name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email ID",
+              "fieldType": "email",
+              "placeholder": "Enter your email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Password",
+              "fieldType": "password",
+              "placeholder": "Enter your password",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2c8c86b0-0cfc-4383-9e1c-1a47450c2477",
+      "name": "Login Form",
+      "webhookId": "b0903609-802e-41dd-af9b-535850699bbf"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['Email ID'] }}",
+        "subject": "Thank You for Submitting the Form",
+        "message": "=Hello  {{ $json.Name }}\nThank you for submitting the form",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "a88c9e84-fa64-4ab5-9210-3bae09435c4d",
+      "name": "Send a message",
+      "webhookId": "4a3d8486-6764-43f7-bcda-e7cb0d27093f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fjoSxxvwG3hfLddA",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Login Form → Gmail Notification Workflow\n\nThis n8n workflow is designed to create a simple login-style form and automatically send an email after the form is submitted.\n\nHow the workflow works:\n-> The workflow starts with the On Form Submission node. This node creates a form where the user enters their Name, Email ID, and Password. When the user clicks the Submit button, the form data is sent to the n8n workflow.\n\n-> The submitted information is then passed to the Gmail node. The Gmail node uses the email address provided in the form and sends a confirmation message to that email address.\n\n-> The email contains the user's name and a message confirming that the form was submitted successfully.",
+        "height": 496,
+        "width": 480
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        544,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "5873cc28-3434-4e9e-925d-075f645f7ad6",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Login Form": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "30dd399f-e1cb-45a3-99d5-d06f1a70859c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b995cf5bbb32cc460eb34ce51057baf4fea605300b37ba54c31fb1a63b065b54"
+  },
+  "nodeGroups": [],
+  "id": "H2MWwgg47SJZBz6D",
+  "tags": []
+}

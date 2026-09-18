@@ -1,0 +1,381 @@
+{
+  "name": "PhysioBot",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "96bfce8a-6dcc-41f0-b5eb-c4f708eeb0ea",
+      "name": "Telegram Trigger",
+      "webhookId": "c8fdd1f6-9a67-4a55-8492-a75563e1be65",
+      "credentials": {
+        "telegramApi": {
+          "id": "wssGsEzbO4PQ4wYt",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "PATIENT REGISTRATION RULES:\n\nWhen a user wants to register:\n\n1. Collect:\n- Name\n- Age\n- Phone Number\n- Email\n\n2. Before creating a patient, ALWAYS use the Google Sheets Get Row(s) tool to search the Patients sheet using the patient's email address.\n\n3. If the email already exists:\n- The patient is already registered.\n- Do NOT use the Append Row tool.\n- Do NOT create a new Patient ID.\n- Tell the patient their existing Patient ID.\n- Ask if they want to book an appointment.\n\n4. If the email does not exist:\n- Ask the patient to confirm their details.\n- After confirmation, use Append Row to create the new patient.\n- Create a new Patient ID.\n\nNever create duplicate patients.\n\n\nAPPOINTMENT BOOKING RULES:\n\nClinic hours: 9:00 AM to 4:00 PM.\nLunch break: 12:00 PM to 1:00 PM.\nAppointment duration: exactly 1 hour.\n\nAppointments are allowed only in these slots:\n9:00–10:00 AM\n10:00–11:00 AM\n11:00 AM–12:00 PM\n1:00–2:00 PM\n2:00–3:00 PM\n3:00–4:00 PM\n\nDo not book before 9:00 AM.\nDo not book after 4:00 PM.\nDo not book during 12:00 PM–1:00 PM.\n\nBefore booking, always check Google Calendar availability.\n\nIf the requested slot is already occupied, do NOT create an appointment.\nTell the patient that the requested slot is unavailable and show the available clinic slots.\n\nOnly create the Google Calendar event after the patient confirms the available slot.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "6edf2f54-f949-4d75-86d1-6e0e75f85804",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "282847bd-e867-4061-8bdc-b8f4950dd2d8",
+      "name": "Send a text message",
+      "webhookId": "1e375d59-7ffe-41ae-9f58-c4eb23d36a05",
+      "credentials": {
+        "telegramApi": {
+          "id": "wssGsEzbO4PQ4wYt",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        64,
+        288
+      ],
+      "id": "237ddd8b-9b96-438a-957e-6c3dc4a33f49",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1TbbKFRZhVy8IhnYKSsNb3VsVeTXRE-s5-JEH-ns6zz0",
+          "mode": "list",
+          "cachedResultName": "Physio bot",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TbbKFRZhVy8IhnYKSsNb3VsVeTXRE-s5-JEH-ns6zz0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Patients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TbbKFRZhVy8IhnYKSsNb3VsVeTXRE-s5-JEH-ns6zz0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Patient ID": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Patient_ID', `A unique patient identifier. Use the next available ID such as P001, P002, P003.`, 'string') }}",
+            "Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Name', `The patient's full name.`, 'string') }}",
+            "Age": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Age', `The patient's age in years. Must be a number.`, 'string') }}",
+            "Phone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone', `The patient's phone number.`, 'string') }}",
+            "Email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email', `The patient's email address.`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Patient ID",
+              "displayName": "Patient ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Age",
+              "displayName": "Age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        272,
+        304
+      ],
+      "id": "243b40e3-a410-43bb-95df-dae5ddf38b84",
+      "name": "Append row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "mlX1jdjvSiApG0t5",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Check whether a physiotherapy appointment slot is available.\n\nThe clinic is open from 9:00 AM to 4:00 PM.\n\nEach appointment is exactly 1 hour.\n\nLunch break is from 12:00 PM to 1:00 PM.\n\nValid appointment slots are:\n9:00 AM - 10:00 AM\n10:00 AM - 11:00 AM\n11:00 AM - 12:00 PM\n1:00 PM - 2:00 PM\n2:00 PM - 3:00 PM\n3:00 PM - 4:00 PM\n\nNever check or offer appointments during the 12:00 PM - 1:00 PM lunch break.\n\nNever allow appointments before 9:00 AM or after 4:00 PM.\n\nUse this tool to check Google Calendar availability before booking an appointment.",
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "narasingraokattamuri@gmail.com",
+          "mode": "list",
+          "cachedResultName": "narasingraokattamuri@gmail.com"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start_Time', `The exact date and time the patient wants for the appointment.\nUse the patient's requested date and time.\nClinic timezone is Asia/Kolkata (IST).`, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End_Time', `The appointment end time.\nThe appointment duration is exactly 1 hour.\nSet this to 1 hour after the requested start time.\nUse the clinic timezone Asia/Kolkata (IST).`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        752,
+        256
+      ],
+      "id": "ebddaa37-3bd2-422d-9a04-e9dc474e33f6",
+      "name": "Get availability in a calendar in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "rQsJQSNpmuzCE8FA",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1TbbKFRZhVy8IhnYKSsNb3VsVeTXRE-s5-JEH-ns6zz0",
+          "mode": "list",
+          "cachedResultName": "Physio bot",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TbbKFRZhVy8IhnYKSsNb3VsVeTXRE-s5-JEH-ns6zz0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Patients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1TbbKFRZhVy8IhnYKSsNb3VsVeTXRE-s5-JEH-ns6zz0/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Email",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', `The patient's email address. Use this to check whether the patient already exists in the Patients sheet.The patient's email address. Use this to check whether the patient already exists in the Patients sheet.`, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        512,
+        288
+      ],
+      "id": "ddcac254-6927-4d55-a794-4dd24126cf4e",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "mlX1jdjvSiApG0t5",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        320
+      ],
+      "id": "47e9df7b-c055-41af-8e4e-54be7b5b825c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "BOblT0kbT4OBj4Jl",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "PhysioBot is an AI-powered Telegram physiotherapy assistant built using n8n. It combines an OpenAI-powered AI Agent with Google Sheets for patient management, Simple Memory for conversational context, and Google Calendar for appointment availability and booking.\n\nThe system enables patients to register, checks for existing patient records, validates appointment requests against clinic working hours, checks real-time calendar availability, and saves confirmed appointments directly to Google Calendar.",
+        "height": 304,
+        "width": 416
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        912,
+        -16
+      ],
+      "typeVersion": 1,
+      "id": "8eef9bbd-8cdb-4be0-86e5-2b63884ed445",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get availability in a calendar in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0b6979b4-7e2a-4d9c-a742-fd9c0222d1f8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b995cf5bbb32cc460eb34ce51057baf4fea605300b37ba54c31fb1a63b065b54"
+  },
+  "nodeGroups": [],
+  "id": "F8U9avqkWibp07Vd",
+  "tags": []
+}
